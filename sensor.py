@@ -23,7 +23,7 @@ class WaterSensor:
 
     def __generate_reading(self):
         self.counter += 1
-        time_stamp = dt.datetime.now(dt.timezone.utc).isoformat()
+        time_stamp = dt.datetime.now(timezone.utc).isoformat()
         pressure_upstream = round(random.uniform(self.base_pressure_upstream, 90.0), 1)
         pressure_downstream = round(random.uniform(self.base_pressure_downstream, 85.0), 1)
         flow_rate = round(random.uniform(self.base_flow_rate, 50.0), 1)
@@ -46,22 +46,52 @@ class WaterSensor:
         - Generate realistic pressure and flow values with small variation
         - Return a dictionary with all fields
         """
-        return self.__generate_base_reading()
+        return self.__generate_reading()
 
-        # def get_leak_reading(self):
-        #
-        #     leak_flow_rate = round(random.uniform(80.0,120.0))
+    def get_leak_reading(self) -> dict:
+
+        leak_reading = self.__generate_reading()
+        leak_flow_rate = round(random.uniform(80.0,120.0), 1)
+        leak_reading["flow_rate"] = leak_flow_rate
+
+        return leak_reading
+
+    def get_blockage_reading(self) -> dict:
+
+        blockage_reading = self.__generate_reading()
+        blockage_reading["pressure_upstream"] = round(random.uniform(95.0,110.0), 1)
+        blockage_reading["pressure_downstream"] = round(random.uniform(50.0, 65.0), 1)
+
+        return blockage_reading
+
+    def get_stuck_reading(self) -> dict:
+
+        stuck_reading = self.__generate_reading()
+        stuck_reading["pressure_downstream"] = stuck_reading["pressure_upstream"]
+        stuck_reading["flow_rate"] = stuck_reading["pressure_downstream"]
+
+        return stuck_reading
 
 
-    #def get_blockage_reading(self):
-    # TO DO
-    #def get_stuck_reading(self):
 
-water_sensor_1 = WaterSensor(1)
-water_sensor_2 = WaterSensor(2)
-print(water_sensor_1.get_reading())
-print(water_sensor_1.get_reading())
-#print(water_sensor_1.get_leak_reading())
+if __name__ == "__main__":
+
+    # Test Sensor
+    sensor = WaterSensor(1)
+
+    print("=== Testing Normal Readings ===")
+    for i in range(5):
+        reading = sensor.get_reading()
+        print(f"Reading {i+1}: Counter={reading['counter']}, "
+              f"Pressure Up={reading['pressure_upstream']}, "
+              f"Flow={reading['flow_rate']}")
+
+        print("\n=== Testing Anomalies ===")
+        print(f"Leak: {sensor.get_leak_reading()}")
+        print(f"Blockage: {sensor.get_blockage_reading()}")
+        print(f"Stuck: {sensor.get_stuck_reading()}")
+
+
 
 
 
