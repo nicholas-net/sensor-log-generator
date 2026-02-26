@@ -39,13 +39,6 @@ class WaterSensor:
 
 
     def get_reading(self):
-        """
-        Generate a normal sensor reading.
-        - Increment the counter
-        - Create timestamp in ISO 8601 UTC format
-        - Generate realistic pressure and flow values with small variation
-        - Return a dictionary with all fields
-        """
         return self.__generate_reading()
 
     def get_leak_reading(self) -> dict:
@@ -72,24 +65,42 @@ class WaterSensor:
 
         return stuck_reading
 
+def save_readings_to_json(self, file_name):
 
+    with open(file_name, "w") as f:
+        json.dumps(file_name)
 
 if __name__ == "__main__":
 
-    # Test Sensor
+    # Generate the dataset
     sensor = WaterSensor(1)
+    readings = []
 
-    print("=== Testing Normal Readings ===")
-    for i in range(5):
-        reading = sensor.get_reading()
-        print(f"Reading {i+1}: Counter={reading['counter']}, "
-              f"Pressure Up={reading['pressure_upstream']}, "
-              f"Flow={reading['flow_rate']}")
+    for i in range(97):
+        readings.append(sensor.get_reading())
 
-        print("\n=== Testing Anomalies ===")
-        print(f"Leak: {sensor.get_leak_reading()}")
-        print(f"Blockage: {sensor.get_blockage_reading()}")
-        print(f"Stuck: {sensor.get_stuck_reading()}")
+    readings.append(sensor.get_leak_reading())
+    readings.append(sensor.get_blockage_reading())
+    readings.append(sensor.get_stuck_reading())
+
+    # Shuffle to mix anomalies
+    random.shuffle(readings)
+
+    print(f"Generated {len(readings)} readings!")
+    print(f"First reading: {readings[0]}")
+    print(f"Last reading: {readings[-1]}")
+
+
+    # Save to JSON
+
+    sensor_file = "sensor_data.json"
+    save_readings_to_json(sensor_file)
+
+
+
+
+
+
 
 
 
